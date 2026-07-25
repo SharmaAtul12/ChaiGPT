@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       Hello World!
     </h1>
     <ModeToggle />
+    <UserButton />
     </div>
   );
 }
