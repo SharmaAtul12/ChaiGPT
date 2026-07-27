@@ -36,6 +36,17 @@ async function assertOwnsConversation(conversationId: string, userId: string) {
 }
 
 /**
+ * Fetches a single conversation owned by the current user.
+ *
+ * @param conversationId - The conversation to load.
+ * @throws {Error} When the conversation is not found.
+ */
+export async function getConversation(conversationId: string) {
+    const user = await requireUser();
+    return assertOwnsConversation(conversationId, user.id)
+}
+
+/**
  * Lists non-archived conversations for the current user.
  * Pinned conversations appear first, then sorted by most recent activity.
 */
