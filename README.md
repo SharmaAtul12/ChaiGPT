@@ -201,15 +201,101 @@ The Prisma schema centers on three entities:
 - `Conversation` stores chat metadata such as title, pin state, archive state, and model override.
 - `Message` stores chat content, role, status, and structured AI parts.
 
-## Repository Structure
+## Folder Structure
 
-- `app/` contains the Next.js routes and layouts.
-- `features/auth/` contains Clerk onboarding and user validation.
-- `features/conversation/` contains chat list, sidebar, and conversation view logic.
-- `features/ai/` contains message persistence and model helpers.
-- `components/` contains reusable UI and AI chat primitives.
-- `prisma/` contains the schema and migrations.
-- `Notes/` contains the frontend and backend flow reference images.
+This project follows a production-ready feature-based structure. Keep UI concerns in the frontend layer, server and persistence concerns in the backend layer, and shared utilities in dedicated cross-cutting folders.
+
+### 1. Frontend Folder Structure
+
+```text
+app/
+	globals.css
+	layout.tsx
+	(auth)/
+		layout.tsx
+		sign-in/
+		sign-up/
+	(root)/
+		layout.tsx
+		page.tsx
+		c/
+			[id]/
+components/
+	ai-elements/
+	providers/
+	ui/
+features/
+	conversation/
+		components/
+		hooks/
+		utils/
+	home/
+		actions/
+		hooks/
+	messages/
+		actions/
+		hooks/
+hooks/
+	use-mobile.ts
+public/
+Notes/
+```
+
+Frontend maintenance rules:
+
+- Keep route composition in `app/` and avoid putting feature logic directly in pages when a reusable feature module already exists.
+- Put chat UI, sidebar UI, and message rendering inside `features/conversation/components/`.
+- Put reusable visual primitives in `components/ui/` and AI-specific presentation components in `components/ai-elements/`.
+- Put client-side data hooks in `features/*/hooks/` so the UI layer stays thin.
+- Keep global styles, theme wiring, and providers centralized instead of duplicating them across pages.
+
+### 2. Backend Folder Structure
+
+```text
+features/
+	auth/
+		actions/
+		hooks/
+	ai/
+		actions/
+		utils/
+	conversation/
+		actions/
+		utils/
+	home/
+		actions/
+	messages/
+		actions/
+lib/
+	db.ts
+	utils.ts
+	generated/
+		prisma/
+prisma/
+	schema.prisma
+	migrations/
+app/
+	api/
+		chat/
+			route.ts
+```
+
+Backend maintenance rules:
+
+- Keep all server-only logic in server actions, route handlers, or backend utilities under `features/*/actions/` and `features/*/utils/`.
+- Keep database access behind `lib/db.ts` and Prisma models; do not scatter raw queries through UI components.
+- Treat `app/api/chat/route.ts` as the only streaming chat entrypoint unless a new API route is intentionally added.
+- Keep schema changes in `prisma/schema.prisma` and migrations in `prisma/migrations/`.
+- Keep AI model selection, message storage, and conversation ownership checks on the server side.
+- When adding a new backend capability, create a feature folder first, then add actions, hooks, or utilities inside that feature instead of expanding unrelated modules.
+
+### Structure Principles
+
+- Feature code should be colocated with the domain it serves.
+- UI should call hooks and actions, not database code directly.
+- Server actions should validate ownership and input before touching persistence.
+- Shared helpers should stay small, explicit, and reusable.
+- New files should follow the same naming style as the existing codebase.
 
 ## Important Routes
 
